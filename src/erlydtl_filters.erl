@@ -196,7 +196,7 @@ date(Input) ->
 
 %% @doc Formats a date according to the given format.
 date(Input, FormatStr) when is_binary(Input) ->
-    list_to_binary(date(binary_to_list(Input), FormatStr));
+    list_to_binary(date(parse_date(binary_to_list(Input)), FormatStr));
 date({{_,_,_} = Date,{_,_,_} = Time}, FormatStr) ->
     erlydtl_dateformat:format({Date, Time}, FormatStr);
 date({_,_,_} = Date, FormatStr) ->
@@ -204,6 +204,19 @@ date({_,_,_} = Date, FormatStr) ->
 date(Input, _FormatStr) when is_list(Input) ->
     io:format("Unexpected date parameter : ~p~n", [Input]),
     "".
+
+parse_date([Y0,Y1,Y2,Y3,_,M0,M1,_,D0,D1,_,H0,H1,_,Mi0,Mi1,_,S0,S1|_]) ->
+    {{list_to_integer([Y0,Y1,Y2,Y3]),
+      list_to_integer([M0,M1]),
+      list_to_integer([D0,D1])},
+     {list_to_integer([H0,H1]),
+      list_to_integer([Mi0,Mi1]),
+      list_to_integer([S0,S1])}};
+parse_date([Y0,Y1,Y2,Y3,_,M0,M1,_,D0,D1|_]) ->
+    {list_to_integer([Y0,Y1,Y2,Y3]),
+     list_to_integer([M0,M1]),
+     list_to_integer([D0,D1])}.
+     
 
 %% @doc If value evaluates to `false', use given default. Otherwise, use the value.
 default(Input, Default) ->
