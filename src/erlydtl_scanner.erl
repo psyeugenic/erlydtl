@@ -156,6 +156,11 @@ scan([_ | T], Scanned, {Row, Column}, {in_comment, Closer}) ->
 scan("\n" ++ T, Scanned, {Row, Column}, in_text) ->
     scan(T, append_text_char(Scanned, {Row, Column}, $\n), {Row + 1, 1}, in_text);
 
+scan("\n" ++ T, Scanned, {Row, _Column}, {in_code, Closer}) ->
+    scan(T, Scanned, {Row+1, 1}, {in_code, Closer});
+scan("\t" ++ T, Scanned, {Row, Column}, {in_code, Closer}) ->
+    scan(T, Scanned, {Row, Column+1}, {in_code, Closer});
+
 scan([H | T], Scanned, {Row, Column}, in_text) ->
     scan(T, append_text_char(Scanned, {Row, Column}, H), {Row, Column + 1}, in_text);
 
